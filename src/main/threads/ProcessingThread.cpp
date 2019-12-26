@@ -177,6 +177,7 @@ void ProcessingThread::run()
 
         // Update statistics
         updateFPS(processingTime);
+        statsData.movementValue = magnificator.getLastMovementValue();
         statsData.nFramesProcessed++;
         // Inform GUI of updated statistics
         emit updateStatisticsInGUI(statsData);
@@ -270,6 +271,7 @@ void ProcessingThread::updateImageProcessingSettings(struct ImageProcessingSetti
         magnificator.clearBuffer();
     }
     this->imgProcSettings.levels = imgProcessingSettings.levels;
+    this->imgProcSettings.threshold = imgProcessingSettings.threshold;
 }
 
 void ProcessingThread::setROI(QRect roi)

@@ -364,6 +364,7 @@ void PlayerThread::updateImageProcessingSettings(struct ImageProcessingSettings 
     this->imgProcSettings.coHigh = imgProcessingSettings.coHigh;
     this->imgProcSettings.chromAttenuation = imgProcessingSettings.chromAttenuation;
     this->imgProcSettings.levels = imgProcessingSettings.levels;
+    this->imgProcSettings.threshold = imgProcessingSettings.threshold;
 
     if(resetBuffer) {
         locker1.unlock();

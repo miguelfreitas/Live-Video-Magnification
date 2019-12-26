@@ -22,7 +22,10 @@
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>.            */
 /************************************************************************************/
 
+#include "QProcess"
 #include "main/magnification/Magnificator.h"
+
+#include <stdio.h>
 
 ////////////////////////
 ///Constructor /////////
@@ -275,6 +278,18 @@ void Magnificator::laplaceMagnify() {
             output = input+motion;
         else
             output = input;
+            
+            
+        Mat motionSquared = motion.mul(motion);
+        Scalar MotionMean, MotionStddev;
+        meanStdDev(motionSquared, MotionMean, MotionStddev);
+        lastMovementValue = MotionMean[0] * motion.total();
+        lastMovementStdDev = MotionStddev[0];
+
+        //Scalar s = motion.dot(motion);
+        //lastMovementValue = s[0];
+        
+        movementValueUpdated();
 
         // Scale output image an convert back to 8bit unsigned
         if(!(imgProcFlags->grayscaleOn || pChannels <= 2)) {
@@ -382,6 +397,17 @@ void Magnificator::waveletMagnify() {
             output = input+motion;
         else
             output = input;
+            
+        Mat motionSquared = motion.mul(motion);
+        Scalar MotionMean, MotionStddev;
+        meanStdDev(motionSquared, MotionMean, MotionStddev);
+        lastMovementValue = MotionMean[0] * motion.total();
+        lastMovementStdDev = MotionStddev[0];
+
+        //Scalar s = motion.dot(motion);
+        //lastMovementValue = s[0];
+        
+        movementValueUpdated();
 
         // Scale output image an convert back to 8bit unsigned
         if(!(imgProcFlags->grayscaleOn || pChannels <= 2)) {
@@ -399,6 +425,7 @@ void Magnificator::waveletMagnify() {
         delete [] inputChannels;
     }
 }
+
 ////////////////////////
 ///Magnified Buffer ////
 ////////////////////////
@@ -516,4 +543,45 @@ void Magnificator::amplifyWavelet(const vector<Mat> &src, vector<Mat> &dst, int 
 void Magnificator::amplifyGaussian(const Mat &src, Mat &dst)
 {
     dst = src * imgProcSettings->amplification;
+}
+
+#define MOVEMENT_WINDOW_SIZE (25*5)
+#define MIN_BELOW_THRES_MILISEC 10000
+void Magnificator::movementValueUpdated()
+{
+    static QTime t;
+    static int idx = 0;
+    static double mov_window[MOVEMENT_WINDOW_SIZE] = {0.0,};
+    static double sum = 0.0;
+    static double sum2 = 0.0;
+    static bool belowThreshold = false;
+    
+    idx = (idx + 1) % MOVEMENT_WINDOW_SIZE;
+    sum  -= mov_window[idx];
+    sum2 -= mov_window[idx] * mov_window[idx];
+    mov_window[idx] = lastMovementValue;
+    sum  += mov_window[idx];
+    sum2 += mov_window[idx] * mov_window[idx];
+
+    double variance = (sum2 - ((sum*sum) / MOVEMENT_WINDOW_SIZE)) / MOVEMENT_WINDOW_SIZE;
+    double stddev = sqrt(variance);
+    printf("%.2f %.3f\n", lastMovementValue, lastMovementStdDev);
+    //printf("%.2f\n", stddev);
+    fflush(stdout);
+    
+    if( stddev < imgProcSettings->threshold ) {
+        if( !belowThreshold ) {
+            t.start();
+        } else if( t.elapsed() > MIN_BELOW_THRES_MILISEC && !pid ) {
+            //QProcess::startDetached("xeyes", {"Jeopardy_Theme.mp3"}, "/tmp", &pid);
+            QProcess::startDetached("xeyes", {}, "/tmp", &pid);
+        }
+        belowThreshold = true;
+    } else {
+        if( belowThreshold ) {
+            QProcess::startDetached("kill", {QString::number(pid)});
+            pid = 0;
+        }
+        belowThreshold = false;
+    }
 }

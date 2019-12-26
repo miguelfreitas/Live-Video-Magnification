@@ -211,6 +211,9 @@ void CameraView::updateProcessingThreadStats(struct ThreadStatisticsData statDat
                           QString("x")+QString::number(processingThread->getCurrentROI().height()));
     // Show number of frames processed in nFramesProcessedLabel
     ui->nFramesProcessedLabel->setText(QString("[") + QString::number(statData.nFramesProcessed) + QString("]"));
+    // Show movement value
+    ui->movementLabel->setText(QString::number(statData.movementValue));
+
 }
 
 void CameraView::updateFrame(const QImage &frame)

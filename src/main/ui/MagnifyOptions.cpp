@@ -49,17 +49,20 @@ MagnifyOptions::MagnifyOptions(QWidget *parent) :
     connect(ui->AmplificationSpinBox, SIGNAL(valueChanged(int)), SLOT(updateSettingsFromOptionsTab()));
     connect(ui->COWavelengthSpinBox, SIGNAL(valueChanged(double)), SLOT(updateSettingsFromOptionsTab()));
     connect(ui->LevelsSpinBox, SIGNAL(valueChanged(int)), SLOT(updateSettingsFromOptionsTab()));
+    connect(ui->ThresholdSpinBox, SIGNAL(valueChanged(double)), SLOT(updateSettingsFromOptionsTab()));
 
     // Update Spinbox
     connect(ui->COWavelengthSlider, SIGNAL(valueChanged(int)), this, SLOT(convertFromSlider(int)));
     connect(doubleSlider, SIGNAL(lowerPositionChanged(int)), this, SLOT(convertFromSlider(int)));
     connect(doubleSlider, SIGNAL(upperPositionChanged(int)), this, SLOT(convertFromSlider(int)));
     connect(ui->ChromSlider, SIGNAL(valueChanged(int)), this, SLOT(convertFromSlider(int)));
+    connect(ui->ThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(convertFromSlider(int)));
 
     // Update Slider
     connect(ui->COWavelengthSpinBox, SIGNAL(valueChanged(double)), this, SLOT(convertFromSpinBox(double)));
     connect(ui->COLowDoubleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(convertFromSpinBox(double)));
     connect(ui->COHighDoubleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(convertFromSpinBox(double)));
+    connect(ui->ThresholdSpinBox, SIGNAL(valueChanged(double)), this, SLOT(convertFromSpinBox(double)));
 
     // Other
     connect(ui->resetButton, SIGNAL(clicked()), SLOT(reset()));
@@ -92,6 +95,8 @@ void MagnifyOptions::convertFromSpinBox(double val)
     }
     if(sender() == ui->COWavelengthSpinBox)
         ui->COWavelengthSlider->setValue((int)(val*10.0));
+    if(sender() == ui->ThresholdSpinBox)
+        ui->ThresholdSlider->setValue((int)(val*10.0));
 }
 
 void MagnifyOptions::convertFromSlider(int val)
@@ -112,6 +117,8 @@ void MagnifyOptions::convertFromSlider(int val)
     }
     if(sender() == ui->COWavelengthSlider)
         ui->COWavelengthSpinBox->setValue((double)val/10.0);
+    if(sender() == ui->ThresholdSlider)
+        ui->ThresholdSpinBox->setValue((double)val/10.0);
 }
 
 // Reset everything to Default, configured in Config.h, depending on Magnify Type. On Start its 0
@@ -146,6 +153,8 @@ void MagnifyOptions::reset()
         doubleSlider->setUpperValue((int)(DEFAULT_MM_COHIGH));
         ui->ChromSpinBox->setValue(DEFAULT_MM_CHROMATTENUATION);
         ui->ChromSlider->setValue(DEFAULT_MM_CHROMATTENUATION);
+        ui->ThresholdSpinBox->setValue(DEFAULT_MM_THRESHOLD);
+        ui->ThresholdSlider->setValue(DEFAULT_MM_THRESHOLD);
         break;
     case 3:
         applyMotionInterface();
@@ -160,6 +169,8 @@ void MagnifyOptions::reset()
         doubleSlider->setUpperValue((int)(DEFAULT_MM_COHIGH));
         ui->ChromSpinBox->setValue(DEFAULT_MM_CHROMATTENUATION);
         ui->ChromSlider->setValue(DEFAULT_MM_CHROMATTENUATION);
+        ui->ThresholdSpinBox->setValue(DEFAULT_MM_THRESHOLD);
+        ui->ThresholdSlider->setValue(DEFAULT_MM_THRESHOLD);
         break;
     default:  
         ui->LevelsSpinBox->setDisabled(true);
@@ -238,6 +249,7 @@ void MagnifyOptions::updateSettingsFromOptionsTab()
     }
     imgProcSettings.chromAttenuation = (double)ui->ChromSpinBox->value()/100.0;
     imgProcSettings.levels = ui->LevelsSpinBox->value();
+    imgProcSettings.threshold = ui->ThresholdSpinBox->value();
 
     emit newImageProcessingSettings(imgProcSettings);
 }

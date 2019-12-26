@@ -70,6 +70,7 @@
 #define DEFAULT_MM_COLOW                    20.0
 #define DEFAULT_MM_COHIGH                   40.0
 #define DEFAULT_MM_CHROMATTENUATION         0
+#define DEFAULT_MM_THRESHOLD                30
 
 
 #endif // CONFIG_H

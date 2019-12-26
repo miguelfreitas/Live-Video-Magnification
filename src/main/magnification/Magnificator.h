@@ -91,6 +91,9 @@ public:
      */
     void waveletMagnify();
 
+    // MF
+    void movementValueUpdated();
+
     ////////////////////////
     ///Magnified Buffer ///
     //////////////////////// 
@@ -130,6 +133,8 @@ public:
      * \return Int, power of 2, minimum 16.
      */
     int getOptimalBufferSize(int fps);
+
+    double getLastMovementValue() { return this->lastMovementValue; }
 
 private:
     /*!
@@ -179,6 +184,8 @@ private:
      */
     int levels;
 
+    qint64 pid;
+
     //////////////////////// 
     ///Cache ///////// /////// 
     //////////////////////// 
@@ -223,6 +230,9 @@ private:
      *  downsampled and to 1 column reshaped images.
      */
     Mat downSampledMat;
+
+    double lastMovementValue;
+    double lastMovementStdDev;
 
     //////////////////////// 
     ///Postprocessing //////

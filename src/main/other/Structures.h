@@ -38,6 +38,7 @@ struct ImageProcessingSettings{
     int frameHeight;
     float framerate;
     int levels;
+    double threshold;
 
     ImageProcessingSettings() :
         amplification(0),
@@ -48,7 +49,8 @@ struct ImageProcessingSettings{
         frameWidth(0),
         frameHeight(0),
         framerate(0),
-        levels(4)
+        levels(4),
+        threshold(3.0)
     {
     }
 };
@@ -78,6 +80,7 @@ struct ThreadStatisticsData{
     int averageFPS;
     double nFramesProcessed;
     double averageVidProcessingFPS;
+    double movementValue;
 };
 
 #endif // STRUCTURES_H
